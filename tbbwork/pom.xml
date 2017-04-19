@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.tbb.task</groupId>
-    <artifactId>tbbwork</artifactId>
+    <artifactId>tbb-work</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <dependencies>
