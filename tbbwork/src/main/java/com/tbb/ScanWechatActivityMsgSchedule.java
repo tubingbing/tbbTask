@@ -23,6 +23,7 @@ public class ScanWechatActivityMsgSchedule implements ITaskDeal<Object> {
     @Override
     public List<Object> select(int taskItemNum, int taskNum, int eachFetchDataNum) throws Exception{
         //LOGGER.info("run ScanWechatActivityMsgSchedule start:" + System.currentTimeMillis());
+        Thread.sleep(5000);
         System.out.println("taskTask--"+taskItemNum+"--"+taskNum+"--"+eachFetchDataNum);
         List<Object> list = new ArrayList();
         for(int i=0;i<10;i++){

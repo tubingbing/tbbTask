@@ -6,7 +6,7 @@
 
     <bean id="scheduleManagerFactory" class="com.tbb.task.TaskManagerFactory" init-method="init">
         <property name="zkAddress" value="127.0.0.1:2181"/>
-        <property name="zkPath" value="/o2o/tbb"/>
+        <property name="zkPath" value="/tbbtest/tbb2"/>
         <property name="zkUserName" value="" />
         <property name="zkPassword" value=""/>
         <property name="zkSessionOut" value="60000"/>

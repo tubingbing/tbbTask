@@ -35,7 +35,6 @@ public class TaskManagerFactory implements ApplicationContextAware {
 
     public void init() throws Exception{
         zkManager = new ZkManager(zkAddress,zkPath,zkUserName,zkPassword,zkSessionOut);
-        zkManager.init();
         if (null == this.ip) {
             try {
                 this.ip = InetAddress.getLocalHost().getHostAddress();
@@ -46,9 +45,7 @@ public class TaskManagerFactory implements ApplicationContextAware {
         serviceId = this.ip+"_"+UUID.randomUUID().toString();
         zkManager.create(zkPath+"/server",null);
         zkManager.create(zkPath+"/server/"+serviceId,null);
-        zkManager.delete(zkPath+"/baseTask");
-        //zkManager.setData(zkPath+"/baseTask/taskTask","{\"beanName\":\"taskTask\",\"fetchNum\":2,\"permitRunStartTime\":\"0/10 * * * * ?\",\"state\":0,\"threadNum\":5}");
-        //zkManager.setData(zkPath+"/baseTask/taskTask2","{\"beanName\":\"taskTask2\",\"fetchNum\":2,\"permitRunStartTime\":\"0/5 * * * * ?\",\"state\":0,\"threadNum\":3}");
+        zkManager.create(zkPath+"/baseTask",null);
         computerStart();
     }
     

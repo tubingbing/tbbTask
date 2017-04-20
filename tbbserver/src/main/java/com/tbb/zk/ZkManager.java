@@ -49,12 +49,12 @@ public class ZkManager implements Watcher{
         acl.add(new ACL(ZooDefs.Perms.ALL, new Id("digest",
                 DigestAuthenticationProvider.generateDigest(authString))));
         acl.add(new ACL(ZooDefs.Perms.READ, ZooDefs.Ids.ANYONE_ID_UNSAFE));
-        //init();
+        init();
     }
 
     public void init() throws Exception {
         //删除历史数据
-        delete(path+"/server");
+        deleteOld(path+"/server");
         //当zk状态正常后才能调用
         if(zk.exists(path,false) == null){
             String[] list = path.split("/");
@@ -70,19 +70,26 @@ public class ZkManager implements Watcher{
         }
     }
 
-    public void delete(String path)throws Exception{
-        List<String> list = getChild(path);
-        if(CollectionUtils.isEmpty(list)){
-            return;
-        }
-        for(String str : list){
-            if(zk.exists(path+"/"+str,false) != null){
-                delete(path+"/"+str);
-                if (str.contains(InetAddress.getLocalHost().getHostAddress())){
-                    zk.delete(path+"/"+str,-1);
+    public void deleteOld(String path)throws Exception{
+        try {
+            List<String> list = getChild(path);
+            if (CollectionUtils.isEmpty(list)) {
+                return;
+            }
+            for (String str : list) {
+                if (zk.exists(path + "/" + str, false) != null) {
+                    deleteOld(path + "/" + str);
+                    if (str.contains(InetAddress.getLocalHost().getHostAddress())) {
+                        this.delete(path + "/" + str);
+                    }
                 }
             }
+        }catch (Exception e){
+            
         }
+    }
+    public void delete(String path) throws Exception{
+        zk.delete(path,-1);
     }
 
     public void create(String path,String data) throws Exception{
@@ -142,5 +149,9 @@ public class ZkManager implements Watcher{
             zk.close();
         }catch (Exception e){
         }
+    }
+
+    public String getPath() {
+        return path;
     }
 }

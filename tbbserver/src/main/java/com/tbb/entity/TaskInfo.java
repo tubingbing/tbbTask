@@ -1,11 +1,13 @@
 package com.tbb.entity;
 
+import java.io.Serializable;
+
 /**
  * @author: tubingbing
  * @Date: 2017/4/18
  * @Time: 16:40
  */
-public class TaskInfo {
+public class TaskInfo implements Serializable {
 
     private String beanName;
     private String threadNum;
