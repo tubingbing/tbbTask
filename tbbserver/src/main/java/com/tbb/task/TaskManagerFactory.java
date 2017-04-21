@@ -7,8 +7,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.util.CollectionUtils;
 
 import java.net.InetAddress;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * 任务工厂
@@ -32,6 +31,8 @@ public class TaskManagerFactory implements ApplicationContextAware {
 
     private String serviceId;
     private String ip;
+    private static Set<String> taskSet = new HashSet<String>();
+    private Timer heartBeatTimer;
 
     public void init() throws Exception{
         zkManager = new ZkManager(zkAddress,zkPath,zkUserName,zkPassword,zkSessionOut);
@@ -42,11 +43,25 @@ public class TaskManagerFactory implements ApplicationContextAware {
                 this.ip = "";
             }
         }
+        if (heartBeatTimer==null){
+            heartBeatTimer = new Timer("TaskManagerFactoryHeartTimer");
+        }
         serviceId = this.ip+"_"+UUID.randomUUID().toString();
+        zkManager.deleteOld(zkPath+"/server");
         zkManager.create(zkPath+"/server",null);
         zkManager.create(zkPath+"/server/"+serviceId,null);
         zkManager.create(zkPath+"/baseTask",null);
-        computerStart();
+        //computerStart();
+        heartBeatTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    computerStart();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        },0,10000);
     }
     
     /**
@@ -58,17 +73,19 @@ public class TaskManagerFactory implements ApplicationContextAware {
         //只有当存在可执行队列后再开始启动队列
         if (!CollectionUtils.isEmpty(list)) {
             for (final String path : list) {
-                new Thread(){
-                    @Override
-                    public void run() {
-                        try {
-                            new TaskManager(zkPath + "/baseTask/"+path,TaskManagerFactory.this);
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                if (!taskSet.contains(path)){
+                     taskSet.add(path);
+                    new Thread(){
+                        @Override
+                        public void run() {
+                            try {
+                                new TaskManager(zkPath + "/baseTask/"+path,TaskManagerFactory.this);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
-                    }
-                }.start();
-
+                    }.start();
+                }
             }
         }
     }

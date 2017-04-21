@@ -1,5 +1,6 @@
 package com.tbb.zk;
 
+import com.tbb.util.JacksonUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.zookeeper.*;
@@ -49,12 +50,10 @@ public class ZkManager implements Watcher{
         acl.add(new ACL(ZooDefs.Perms.ALL, new Id("digest",
                 DigestAuthenticationProvider.generateDigest(authString))));
         acl.add(new ACL(ZooDefs.Perms.READ, ZooDefs.Ids.ANYONE_ID_UNSAFE));
-        init();
+        //init();
     }
 
     public void init() throws Exception {
-        //删除历史数据
-        deleteOld(path+"/server");
         //当zk状态正常后才能调用
         if(zk.exists(path,false) == null){
             String[] list = path.split("/");

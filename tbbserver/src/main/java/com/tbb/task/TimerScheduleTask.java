@@ -14,14 +14,10 @@ import java.util.Timer;
 public class TimerScheduleTask extends java.util.TimerTask{
     private static transient Log log = LogFactory.getLog(TimerScheduleTask.class);
     TaskManager manager;
-    Timer timer;
-    String cronTabExpress;
     TaskInfo taskInfo;
-    public int state ;
 
-    public TimerScheduleTask(TaskManager aManager,Timer aTimer,TaskInfo taskInfo) {
+    public TimerScheduleTask(TaskManager aManager,TaskInfo taskInfo) {
         this.manager = aManager;
-        this.timer = aTimer;
         this.taskInfo = taskInfo;
     }
     public void run() {
@@ -36,21 +32,5 @@ public class TimerScheduleTask extends java.util.TimerTask{
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
         }
-    }
-
-    public String getCronTabExpress() {
-        return cronTabExpress;
-    }
-
-    public void setCronTabExpress(String cronTabExpress) {
-        this.cronTabExpress = cronTabExpress;
-    }
-
-    public int getState() {
-        return state;
-    }
-
-    public void setState(int state) {
-        this.state = state;
     }
 }

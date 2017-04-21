@@ -36,7 +36,7 @@ public class TaskManager<T> {
         }catch (Exception e){
              e.printStackTrace();
         }
-        TimerScheduleTask scheduleTask = new TimerScheduleTask(this, heartBeatTimer, taskInfo);
+        TimerScheduleTask scheduleTask = new TimerScheduleTask(this, taskInfo);
         if(taskInfo==null){
             heartBeatTimer.schedule(scheduleTask, 5000);
             return;
@@ -49,7 +49,6 @@ public class TaskManager<T> {
                 CronExpression cexpStart = new CronExpression(tmpStr);
                 Date current = new Date(System.currentTimeMillis());
                 Date firstStartTime = cexpStart.getNextValidTimeAfter(current);
-                scheduleTask.setCronTabExpress(tmpStr);
                 heartBeatTimer.schedule(scheduleTask, firstStartTime);
             }
         }catch (Exception e){
@@ -80,23 +79,29 @@ public class TaskManager<T> {
         }
         final int threadNum = Integer.parseInt(taskInfo.getThreadNum());
         if(taskList.size()==0){return;}
-        final int[] nums = assignTaskNumber(threadNum,taskList.size());
-        for(int i=0;i<threadNum;i++){
-            final int n=nums[i];
-            new Thread("multi deal execute"){
-                @Override
-                public void run(){
-                    List<T> list = getScheduleTaskIdMulti(n);
-                    try {
-                        if(list != null){
-                            taskDeal.execute(list);
+        if (threadNum > 1){
+            final int[] nums = assignTaskNumber(threadNum,taskList.size());
+            for(int i=0;i<threadNum;i++){
+                final int n=nums[i];
+                new Thread("multi deal execute"){
+                    @Override
+                    public void run(){
+                        List<T> list = getScheduleTaskIdMulti(n);
+                        try {
+                            if(list != null){
+                                taskDeal.execute(list);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
-                }
-            }.start();
+                }.start();
+            }
+        }else {
+            taskDeal.execute(taskList);
+            taskList.clear();
         }
+
     }
     public synchronized List<T> getScheduleTaskIdMulti(int num) {
         List<T> list = new ArrayList<T>(num);

@@ -4,6 +4,7 @@ import com.tbb.zk.ZkManager;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.io.File;
 import java.io.FileReader;
 import java.util.Properties;
@@ -22,18 +23,26 @@ public class ZKManagerFactory {
     @PostConstruct
     public void init() {
         try {
-            File file = new File(this.getClass().getResource("/").getPath()+configFile);
+            File file = new File(this.getClass().getResource("/").getPath() + configFile);
 
-            if(file.exists()){
+            if (file.exists()) {
                 Properties p = new Properties();
                 FileReader reader = new FileReader(file);
                 p.load(reader);
                 reader.close();
-                zkManager = new ZkManager(p.getProperty("zkConnectString"),p.getProperty("rootPath"),p.getProperty("userName"),
-                        p.getProperty("password"),p.getProperty("zkSessionTimeout"));
+                zkManager = new ZkManager(p.getProperty("zkConnectString"), p.getProperty("rootPath"), p.getProperty("userName"),
+                        p.getProperty("password"), p.getProperty("zkSessionTimeout"));
+                zkManager.init();
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @PreDestroy
+    public void destory() {
+        if (zkManager != null) {
+            zkManager.close();
         }
     }
 
